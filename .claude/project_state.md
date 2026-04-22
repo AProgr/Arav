@@ -1,47 +1,109 @@
----
-name: Arav project current state
-description: Arav системийн одоогийн явц, хийгдсэн болон хийгдээгүй зүйлс
-type: project
-originSessionId: cb3b91ad-8982-446d-9070-ed5f956faf7a
----
-Мэдээлэл оруулах, хайх, тайлан гаргах систем. Иргэний (fact_civil) бүртгэлийн систем — 10/100/1000-ын дарга нар мобайлаас, adminууд PC-ээс ашиглана.
+# Arav Project — Claude Memory
 
-**Why:** Иргэдийн мэдээллийг hierarchy (арван→зуун→мянгат) бүтцээр бүртгэх, хайх, тайлан гаргах систем.
+## Систем
+Мэдээлэл оруулах, хайх, тайлан гаргах систем.
+Иргэний (fact_civil) бүртгэл — 10/100/1000-ын дарга нар мобайлаас, admin-ууд PC-ээс ашиглана.
 
-**How to apply:** Frontend нь mobile-first (login page), dashboard нь desktop-oriented байх ёстой.
+## Tech Stack
+- Frontend: Next.js 16.2.4 + Tailwind v4 → `frontend/` (port 3000)
+- Backend: Node.js + Express → `backend/` (port 3001)
+- Database: PostgreSQL 16 (Docker container: `arav_db`, port 5432)
+- DB: host=localhost, db=arav, user=arav_user, pass=arav_pass
 
-## Tech stack
-- Frontend: Next.js 16.2.4 + Tailwind v4 — `d:/my app/Arav/frontend/` (port 3000)
-- Backend: Node.js + Express — `d:/my app/Arav/backend/` (port 3001)
-- Database: PostgreSQL 16 (Docker container: arav_db, port 5432)
-- DB creds: host=localhost, db=arav, user=arav_user, pass=arav_pass
+## Server эхлүүлэх
+```bash
+# Database
+docker start arav_db
 
-## Server эхлүүлэх команд
-- Backend: `cd "d:/my app/Arav/backend" && /c/Program\ Files/nodejs/node.exe src/index.js`
-- Frontend: `cd "d:/my app/Arav/frontend" && /c/Program\ Files/nodejs/node.exe node_modules/next/dist/bin/next dev --port 3000`
-- DB: docker container `arav_db` — аль хэдийн ажиллаж байна (docker start arav_db)
+# Backend
+cd "d:/my app/Arav/backend"
+/c/Program\ Files/nodejs/node.exe src/index.js
 
-## Хийгдсэн зүйлс
-- [x] Backend: Express сервер, JWT auth, `/api/auth/login`, `/api/auth/register`
-- [x] Backend: `/api/civil` CRUD + search endpoints
-- [x] Database: sec_role, sec_user, sec_user_role, migration файлууд бэлэн
-- [x] Database: fact_civil migration бэлэн (гэхдээ type mismatch алдаатай — user_id NUMERIC vs INTEGER)
-- [x] Frontend: `app/lib/api.ts` — API utility (JWT + fetch)
-- [x] Frontend: `app/login/page.tsx` — Dark theme, neon green, мобайл-first дизайн (Dribbble-аас сонгосон)
-- [x] Frontend: `app/dashboard/layout.tsx` — Auth шалгадаг layout
-- [x] Frontend: `app/page.tsx` — /dashboard руу redirect
-- [x] Test хэрэглэгч: username=admin, password=admin123
+# Frontend
+cd "d:/my app/Arav/frontend"
+/c/Program\ Files/nodejs/node.exe node_modules/next/dist/bin/next dev --port 3000
+```
 
-## Хийгдээгүй (дараагийн session)
-- [ ] fact_civil migration-ийн type mismatch засах (user_id: NUMERIC → INTEGER)
+> Node.js нь bash PATH-д байхгүй — бүтэн зам ашиглах шаардлагатай
+> `node_modules/.bin/next` Windows bash дээр ажиллахгүй — `node_modules/next/dist/bin/next` ашиглах
+
+## Test хэрэглэгч
+- username: `admin`
+- password: `admin123`
+
+## Файлын бүтэц
+```
+Arav/
+├── .claude/
+│   └── project_state.md       ← энэ файл
+├── .gitignore
+├── CLAUDE.md
+├── backend/
+│   ├── package.json
+│   └── src/
+│       ├── index.js            ← Express сервер, /api/auth, /api/civil
+│       ├── db.js               ← PostgreSQL pool
+│       ├── middleware/auth.js  ← JWT middleware
+│       ├── routes/auth.js      ← login, register
+│       ├── routes/civil.js     ← CRUD + search (auth шаардана)
+│       ├── controllers/authController.js
+│       └── controllers/civilController.js
+├── database/
+│   ├── docker-compose.yml
+│   ├── migrate.js
+│   └── migrations/
+│       ├── 001_create_sec_role.sql      ✓ ажилласан
+│       ├── 002_create_sec_user.sql      ✓ ажилласан
+│       ├── 003_create_sec_user_role.sql ✓ ажилласан
+│       └── 004_create_fact_civil.sql    ✗ type mismatch алдаа
+└── frontend/
+    └── app/
+        ├── layout.tsx          ← title="Arav"
+        ├── page.tsx            ← /dashboard руу redirect
+        ├── globals.css
+        ├── lib/
+        │   └── api.ts          ← fetch utility, JWT, Civil interface
+        ├── login/
+        │   └── page.tsx        ← Dark/neon green дизайн, мобайл-first
+        ├── dashboard/
+        │   └── layout.tsx      ← Auth шалгана, nav, logout
+        └── preview/            ← устгаж болно (template туршилт)
+            ├── 1/page.tsx
+            └── 2/page.tsx
+```
+
+## Хийгдсэн
+- [x] Backend: Express + JWT auth + civil CRUD + search
+- [x] Database: sec_role, sec_user, sec_user_role migration-ууд ажилласан
+- [x] Frontend: API utility (`app/lib/api.ts`)
+- [x] Frontend: Login page — dark background, neon lime (#a3ff50), grid pattern, мобайл-first, desktop дээр 320px centered card
+- [x] Frontend: Dashboard layout (auth шалгана, nav, logout)
+- [x] Git: https://github.com/AProgr/Arav
+
+## Хийгдээгүй (дараагийн session-д эхлэх)
+- [ ] `004_create_fact_civil.sql` — `user_id NUMERIC(9)` → `INTEGER` болгож засах (foreign key type mismatch)
 - [ ] fact_civil migration ажиллуулах
-- [ ] `app/dashboard/page.tsx` — Dashboard нүүр хуудас
+- [ ] `app/dashboard/page.tsx` — Dashboard нүүр (welcome / статистик)
 - [ ] `app/dashboard/civil/page.tsx` — Жагсаалт + хайлт
 - [ ] `app/dashboard/civil/new/page.tsx` — Шинэ бүртгэл form
 - [ ] `app/dashboard/civil/[id]/edit/page.tsx` — Засах form
-- [ ] Preview хуудсуудыг (`/preview/1`, `/preview/2`) устгах
+- [ ] `app/preview/` хавтсыг устгах
+- [ ] CLAUDE.md шинэчлэх
 
-## Тэмдэглэл
-- Node.js нь PATH-д байхгүй, бүтэн замаар дуудах: `/c/Program Files/nodejs/node.exe`
-- Next.js `.bin/next` Windows дээр ажиллахгүй, `node_modules/next/dist/bin/next` ашиглах
-- `database/migrate.js` дотор `pg` module байхгүй — backend-аас ажиллуулах хэрэгтэй
+## API endpoints
+```
+POST  /api/auth/login             → { token, user_id, username, roles }
+POST  /api/auth/register          → { user_id, username }
+GET   /api/civil                  → [Civil] (auth)
+GET   /api/civil/search?q=...     → [Civil] (auth)
+GET   /api/civil/:id              → Civil (auth)
+POST  /api/civil                  → Civil (auth)
+PUT   /api/civil/:id              → Civil (auth)
+PATCH /api/civil/:id/deactivate   → (auth)
+```
+
+## Дизайн шийдвэрүүд
+- Login: Dribbble dark/neon green template-аас сонгосон
+- Leader нар мобайлаас → login мобайл-first
+- Admin нар PC-ээс → dashboard desktop-oriented
+- Нэвтрэх нэрийн талбар: username (email биш)
