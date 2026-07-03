@@ -66,7 +66,8 @@ Arav/
         ├── login/
         │   └── page.tsx        ← Dark/neon green дизайн, мобайл-first
         ├── dashboard/
-        │   └── layout.tsx      ← Auth шалгана, nav, logout
+        │   ├── layout.tsx      ← Auth шалгана, nav, logout
+        │   └── page.tsx        ← Dashboard нүүр (welcome + статистик)
         └── preview/            ← устгаж болно (template туршилт)
             ├── 1/page.tsx
             └── 2/page.tsx
@@ -78,12 +79,13 @@ Arav/
 - [x] Frontend: API utility (`app/lib/api.ts`)
 - [x] Frontend: Login page — dark background, neon lime (#a3ff50), grid pattern, мобайл-first, desktop дээр 320px centered card
 - [x] Frontend: Dashboard layout (auth шалгана, nav, logout)
+- [x] Frontend: Dashboard нүүр хуудас (`app/dashboard/page.tsx`) — welcome + статистик картууд
+- [x] Frontend: `api.ts` — `NEXT_PUBLIC_API_URL` env var-аар backend хаяг тохируулах боломжтой (fallback `localhost:3001/api`)
 - [x] Git: https://github.com/AProgr/Arav
 
 ## Хийгдээгүй (дараагийн session-д эхлэх)
 - [ ] `004_create_fact_civil.sql` — `user_id NUMERIC(9)` → `INTEGER` болгож засах (foreign key type mismatch)
 - [ ] fact_civil migration ажиллуулах
-- [ ] `app/dashboard/page.tsx` — Dashboard нүүр (welcome / статистик)
 - [ ] `app/dashboard/civil/page.tsx` — Жагсаалт + хайлт
 - [ ] `app/dashboard/civil/new/page.tsx` — Шинэ бүртгэл form
 - [ ] `app/dashboard/civil/[id]/edit/page.tsx` — Засах form
@@ -101,6 +103,25 @@ POST  /api/civil                  → Civil (auth)
 PUT   /api/civil/:id              → Civil (auth)
 PATCH /api/civil/:id/deactivate   → (auth)
 ```
+
+## Нийтэд түр байрлуулах (demo) — cloudflared
+Бусдад интернэтээр түр харуулахдаа Cloudflare quick tunnel ашигласан (бүртгэлгүй, үнэгүй):
+```bash
+# cloudflared.exe татах: github.com/cloudflare/cloudflared/releases → cloudflared-windows-amd64.exe
+cloudflared.exe tunnel --url http://localhost:3000   # frontend → https://xxx.trycloudflare.com
+cloudflared.exe tunnel --url http://localhost:3001   # backend  → https://yyy.trycloudflare.com
+```
+Бусад хүн login хийж чадахын тулд:
+1. Backend-д тусад нь tunnel гаргах (`localhost:3001`)
+2. `frontend/.env.local` дотор `NEXT_PUBLIC_API_URL=https://yyy.trycloudflare.com/api` (энэ файл gitignore-д, git-д ордоггүй)
+3. `next.config.ts` → `allowedDevOrigins: ['xxx.trycloudflare.com']` (Next.js 16 dev режимд шаардана)
+4. `.env.local`/`next.config.ts` өөрчилсний дараа frontend-ийг **restart** хийх (`NEXT_PUBLIC_*`-ийг эхлэхдээ уншдаг)
+
+> ⚠️ trycloudflare хаяг эхлүүлэх бүрт өөр болдог — ephemeral. PC + backend + frontend + 2 tunnel + Docker бүгд асаалттай байх ёстой.
+> ⚠️ HTTPS хуудаснаас `http://localhost` руу хандахыг браузер mixed-content-оор хаадаг — тиймээс backend-ийг мөн HTTPS tunnel-аар гаргах шаардлагатай (эсвэл зөвхөн UI харуулбал frontend tunnel хангалттай).
+
+### Оношилсон нэг зүйл (санамж)
+Login "ажиллахгүй, алдаа өгөхгүй" гэж харагдвал — үнэндээ login АМЖИЛТТАЙ болоод `/dashboard` руу шилжсэн байж болно. Өмнө нь `app/dashboard/page.tsx` байгаагүй тул 404 гарч, эвдэрсэн мэт харагддаг байсан. Одоо энэ хуудсыг үүсгэсэн.
 
 ## Дизайн шийдвэрүүд
 - Login: Dribbble dark/neon green template-аас сонгосон
