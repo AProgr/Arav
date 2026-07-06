@@ -81,14 +81,17 @@ Arav/
 - [x] Frontend: Dashboard layout (auth шалгана, nav, logout)
 - [x] Frontend: Dashboard нүүр хуудас (`app/dashboard/page.tsx`) — welcome + статистик картууд
 - [x] Frontend: `api.ts` — `NEXT_PUBLIC_API_URL` env var-аар backend хаяг тохируулах боломжтой (fallback `localhost:3001/api`)
+- [x] Database: `004_create_fact_civil.sql` — type mismatch засагдсан (INTEGER FK), forename нэмсэн, profession→edu_profession_code, 17 хувийн талбар нэмсэн (55 багана), migration ажилласан
+- [x] Database: 16 lu_ лавлах хүснэгт (`005_create_lu_tables.sql`) + анхны өгөгдөл (`seeds/001_seed_lu_tables.sql`, 154 мөр Монголын нөхцөлд)
+- [x] Backend: `/api/lookup/:name` lookup API (16 lu_ хүснэгт, `?parent=` шаталсан шүүлт), civilController шинэ schema-д тааруулсан
+- [x] Frontend: `app/dashboard/civil/new/page.tsx` — бүртгэлийн форм (7 хэсэг, 12 dropdown, шаталсан хаяг), `api.ts`-д lookup + шинэ Civil interface
 - [x] Git: https://github.com/AProgr/Arav
 
 ## Хийгдээгүй (дараагийн session-д эхлэх)
-- [ ] `004_create_fact_civil.sql` — `user_id NUMERIC(9)` → `INTEGER` болгож засах (foreign key type mismatch)
-- [ ] fact_civil migration ажиллуулах
-- [ ] `app/dashboard/civil/page.tsx` — Жагсаалт + хайлт
-- [ ] `app/dashboard/civil/new/page.tsx` — Шинэ бүртгэл form
-- [ ] `app/dashboard/civil/[id]/edit/page.tsx` — Засах form
+- [ ] `app/dashboard/civil/page.tsx` — Жагсаалт + хайлт (nav дахь "Иргэний бүртгэл" одоо 404, энэ засна)
+- [ ] `app/dashboard/civil/[id]/edit/page.tsx` — Засах form (backend update бэлэн)
+- [ ] fact_civil._code → lu_ хүснэгтүүд рүү FK холбоо нэмэх (сонголт)
+- [ ] lu_ хүснэгтүүдийг бүрэн жагсаалтаар дүүргэх (330+ сум, олон мянган хороо — одоо зөвхөн жишээ)
 - [ ] `app/preview/` хавтсыг устгах
 - [ ] CLAUDE.md шинэчлэх
 
@@ -102,7 +105,18 @@ GET   /api/civil/:id              → Civil (auth)
 POST  /api/civil                  → Civil (auth)
 PUT   /api/civil/:id              → Civil (auth)
 PATCH /api/civil/:id/deactivate   → (auth)
+GET   /api/lookup                 → [name] (auth) — боломжтой лавлахуудын нэрс
+GET   /api/lookup/:name           → [{code,name,parent_code}] (auth)
+GET   /api/lookup/:name?parent=XX → шаталсан шүүлт (сум←аймаг, хороо←сум)
 ```
+
+## Өгөгдлийн загвар — lu_ лавлах хүснэгтүүд
+16 lu_ хүснэгт: ethnicity, nationality, birth_place, marital_status, aimag_city,
+soum_district, bag_khoroo, edu_level, edu_profession, org, emp_position,
+social_status, disability, military_status, income_level, leader_type.
+- Бүтэц: `<нэр>_id/_code/_name/_desc`, `parent_code` (шаталсан), `sort_order`, audit, status
+- `fact_civil.<x>_code` → `lu_<x>.<x>_code` (одоо FK биш, зөвхөн логик холбоо)
+- Кирилл: Git Bash `curl -d` payload эвддэг — UTF-8 файлаас `curl --data @file`. Браузер fetch зөв.
 
 ## Нийтэд түр байрлуулах (demo) — cloudflared
 Бусдад интернэтээр түр харуулахдаа Cloudflare quick tunnel ашигласан (бүртгэлгүй, үнэгүй):

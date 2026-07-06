@@ -9,6 +9,7 @@ app.use(express.json());
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/civil', require('./routes/civil'));
+app.use('/api/lookup', require('./routes/lookup'));
 
 app.get('/', (_req, res) => {
   res.json({ message: 'Arav API ажиллаж байна' });

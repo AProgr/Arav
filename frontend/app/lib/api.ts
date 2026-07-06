@@ -24,28 +24,59 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export interface Civil {
   civil_id: number;
+  user_id?: number;
+  parent_civil_id?: number;
+
+  forename?: string;
   last_name: string;
   first_name: string;
   gender: 'M' | 'F';
   date_of_birth: string;
   register_num?: string;
   registered_num?: string;
+
   phone?: string;
   email?: string;
+  secondary_phone?: string;
+  emergency_phone?: string;
+
+  id_card_num?: string;
+  blood_type?: string;
+  ethnicity_code?: string;
+  nationality_code?: string;
+  birth_place_code?: string;
+  marital_status_code?: string;
+  photo_url?: string;
+
+  father_name?: string;
+  mother_name?: string;
+  spouse_name?: string;
+  children_count?: number;
+
   addr_aimag_city_code?: string;
   addr_soum_district_code?: string;
   addr_bag_khorro_code?: string;
   addr_detail?: string;
+
   edu_level_code?: string;
-  profession?: string;
+  edu_profession_code?: string;
   org_code?: string;
   emp_position_code?: string;
+  social_status_code?: string;
+  disability_code?: string;
+  military_status_code?: string;
+  income_level_code?: string;
+
   is_leaf?: string;
   leader_code?: string;
-  parent_civil_id?: number;
-  user_id?: number;
   username?: string;
   status?: string;
+}
+
+export interface LuItem {
+  code: string;
+  name: string;
+  parent_code?: string | null;
 }
 
 export interface AuthResponse {
@@ -74,4 +105,9 @@ export const api = {
     deactivate: (id: number) =>
       request<{ message: string }>(`/civil/${id}/deactivate`, { method: 'PATCH' }),
   },
+
+  lookup: (name: string, parent?: string) =>
+    request<LuItem[]>(
+      `/lookup/${name}${parent !== undefined ? `?parent=${encodeURIComponent(parent)}` : ''}`
+    ),
 };
