@@ -85,11 +85,14 @@ Arav/
 - [x] Database: 16 lu_ лавлах хүснэгт (`005_create_lu_tables.sql`) + анхны өгөгдөл (`seeds/001_seed_lu_tables.sql`, 154 мөр Монголын нөхцөлд)
 - [x] Backend: `/api/lookup/:name` lookup API (16 lu_ хүснэгт, `?parent=` шаталсан шүүлт), civilController шинэ schema-д тааруулсан
 - [x] Frontend: `app/dashboard/civil/new/page.tsx` — бүртгэлийн форм (7 хэсэг, 12 dropdown, шаталсан хаяг), `api.ts`-д lookup + шинэ Civil interface
+- [x] Frontend: `app/dashboard/civil/page.tsx` — иргэдийн жагсаалт + хайлт + "Шинэ бүртгэл" товч (nav 404 засагдсан)
+- [x] Backend: `db.js` — DATE parser нэмсэн (огноо цагийн бүсээр нэг өдөр шилжихийг зассан)
 - [x] Git: https://github.com/AProgr/Arav
 
 ## Хийгдээгүй (дараагийн session-д эхлэх)
-- [ ] `app/dashboard/civil/page.tsx` — Жагсаалт + хайлт (nav дахь "Иргэний бүртгэл" одоо 404, энэ засна)
 - [ ] `app/dashboard/civil/[id]/edit/page.tsx` — Засах form (backend update бэлэн)
+- [ ] Жагсаалт/форм-д код талбарыг нэрээр харуулах (KHALKH код → Халх нэр)
+- [ ] Dashboard нүүрэн дэх статистик "—"-г бодит тоогоор
 - [ ] fact_civil._code → lu_ хүснэгтүүд рүү FK холбоо нэмэх (сонголт)
 - [ ] lu_ хүснэгтүүдийг бүрэн жагсаалтаар дүүргэх (330+ сум, олон мянган хороо — одоо зөвхөн жишээ)
 - [ ] `app/preview/` хавтсыг устгах
